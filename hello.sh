@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+
+echo $USER
+echo $PATH
+echo $SHELL
