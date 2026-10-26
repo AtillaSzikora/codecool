@@ -9,15 +9,19 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_subnet" "this" {
-    vpc_id = aws_vpc.this.id
     count = local.subnet_pairs_count * 2
+    
+    vpc_id = aws_vpc.this.id
     cidr_block = "10.0.${count.index + 1}.0/24"
     availability_zone = local.availability_zones[
         count.index % length(local.availability_zones)
     ]
     tags = {
         Name = "Kalman-subnet-${count.index + 1}"
-        Type = count.index < local.subnet_pairs_count ? "public" : "private"
+        Type = (count.index < local.subnet_pairs_count
+            ? "public"
+            : "private"
+        )
     }
 }
 
@@ -33,4 +37,29 @@ resource "aws_nat_gateway" "this" {
     availability_mode = "zonal"
     depends_on = [ aws_internet_gateway.this ]
     tags = { Name = "Kalman-NAT-GW" }
+}
+
+resource "aws_route_table" "this" {
+    count = local.subnet_pairs_count * 2
+    
+    vpc_id = aws_vpc.this.id
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = (count.index < local.subnet_pairs_count
+            ? aws_internet_gateway.this.id
+            : null
+        )
+        nat_gateway_id = (count.index < local.subnet_pairs_count
+            ? null
+            : aws_nat_gateway.this.id
+        )
+    }
+    tags = { Name = "Kalman-RT-${count.index + 1}" }
+}
+
+resource "aws_route_table_association" "this" {
+    count = local.subnet_pairs_count * 2
+    
+    subnet_id = aws_subnet.this[count.index].id
+    route_table_id = aws_route_table.this[count.index].id
 }

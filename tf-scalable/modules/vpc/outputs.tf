@@ -16,12 +16,12 @@ output "igw_info" {
 output "subnet_info" {
     value = {
         for subnet in aws_subnet.this :
-        subnet.tags["Name"] => {
-            ID   = subnet.id
-            CIDR = subnet.cidr_block
-            AZ   = subnet.availability_zone
-            Tags = subnet.tags_all
-        }
+            subnet.tags["Name"] => {
+                ID   = subnet.id
+                CIDR = subnet.cidr_block
+                AZ   = subnet.availability_zone
+                Tags = subnet.tags_all
+            }
     }
 }
 
@@ -39,5 +39,22 @@ output "nat_gw_info" {
         Public-IP = aws_nat_gateway.this.public_ip
         Subnet-ID = aws_nat_gateway.this.subnet_id
         Tags = aws_nat_gateway.this.tags_all
+    }
+}
+
+output "rt_info" {
+    value = {
+        for rt in aws_route_table.this :
+            rt.tags["Name"] => {
+                ID = rt.id
+                Tags = rt.tags_all
+            }
+    }
+}
+
+output "rt_assoc_info" {
+    value = {
+        for rt-assoc in aws_route_table_association.this :
+            rt-assoc.subnet_id => rt-assoc.route_table_id
     }
 }
