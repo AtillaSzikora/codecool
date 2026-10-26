@@ -1,6 +1,6 @@
 resource "aws_vpc" "this" {
-    cidr_block = local.vpc_config.cidr_block
-    tags = local.vpc_config.tags
+    cidr_block = var.vpc_config.cidr_block
+    tags = var.vpc_config.tags
 }
 
 resource "aws_internet_gateway" "this" {
@@ -9,7 +9,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_subnet" "this" {
-    count = local.subnet_pairs_count * 2
+    count = var.subnet_pairs_count * 2
     
     vpc_id = aws_vpc.this.id
     cidr_block = "10.0.${count.index + 1}.0/24"
@@ -17,11 +17,8 @@ resource "aws_subnet" "this" {
         count.index % length(local.availability_zones)
     ]
     tags = {
-        Name = "Kalman-subnet-${count.index + 1}"
-        Type = (count.index < local.subnet_pairs_count
-            ? "public"
-            : "private"
-        )
+        Name = "Kalman-${local.subnet_type[count.index]}-subnet-${count.index + 1}"
+        Type = local.subnet_type[count.index]
     }
 }
 
@@ -40,16 +37,16 @@ resource "aws_nat_gateway" "this" {
 }
 
 resource "aws_route_table" "this" {
-    count = local.subnet_pairs_count * 2
+    count = var.subnet_pairs_count * 2
     
     vpc_id = aws_vpc.this.id
     route {
         cidr_block = "0.0.0.0/0"
-        gateway_id = (count.index < local.subnet_pairs_count
+        gateway_id = (count.index < var.subnet_pairs_count
             ? aws_internet_gateway.this.id
             : null
         )
-        nat_gateway_id = (count.index < local.subnet_pairs_count
+        nat_gateway_id = (count.index < var.subnet_pairs_count
             ? null
             : aws_nat_gateway.this.id
         )
@@ -58,7 +55,7 @@ resource "aws_route_table" "this" {
 }
 
 resource "aws_route_table_association" "this" {
-    count = local.subnet_pairs_count * 2
+    count = var.subnet_pairs_count * 2
     
     subnet_id = aws_subnet.this[count.index].id
     route_table_id = aws_route_table.this[count.index].id

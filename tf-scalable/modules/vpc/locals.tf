@@ -1,16 +1,12 @@
 locals {
-    region = "eu-central-1"
-
     availability_zones = [
-        "${local.region}a",
-        "${local.region}b",
-        "${local.region}c",
+        "${var.region}a",
+        "${var.region}b",
+        "${var.region}c",
     ]
 
-    vpc_config = {
-        cidr_block = "10.0.0.0/16"
-        tags = { Name = "Kalman-main-VPC" }
-    }
-
-    subnet_pairs_count = 3
+    subnet_type = [
+        for i in range(var.subnet_pairs_count * 2) :
+            i < var.subnet_pairs_count ? "public" : "private"
+    ]
 }
