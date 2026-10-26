@@ -1,13 +1,16 @@
-output "vpc_id" {
-    value = aws_vpc.this.id
+output "vpc_info" {
+    value = {
+        ID = aws_vpc.this.id
+        Tags = aws_vpc.this.tags_all
+    }
 }
 
-output "vpc_arn" {
-    value = aws_vpc.this.arn
-}
-
-output "vpc_tags_all" {
-    value = aws_vpc.this.tags_all
+output "igw_info" {
+    value = {
+        ID = aws_internet_gateway.this.id
+        Owner = aws_internet_gateway.this.owner_id
+        Tags = aws_internet_gateway.this.tags_all
+    }
 }
 
 output "subnet_info" {
@@ -19,5 +22,22 @@ output "subnet_info" {
             AZ   = subnet.availability_zone
             Tags = subnet.tags_all
         }
+    }
+}
+
+output "eip_info" {
+    value = {
+        ID = aws_eip.this.id
+        Public-IP = aws_eip.this.public_ip
+        Tags = aws_eip.this.tags_all
+    }
+}
+
+output "nat_gw_info" {
+    value = {
+        ID = aws_nat_gateway.this.id
+        Public-IP = aws_nat_gateway.this.public_ip
+        Subnet-ID = aws_nat_gateway.this.subnet_id
+        Tags = aws_nat_gateway.this.tags_all
     }
 }
