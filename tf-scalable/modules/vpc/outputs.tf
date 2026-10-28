@@ -15,13 +15,12 @@ output "igw_info" {
 
 output "subnet_info" {
     value = {
-        for subnet in aws_subnet.this :
-            subnet.tags["Name"] => {
-                ID   = subnet.id
-                CIDR = subnet.cidr_block
-                AZ   = subnet.availability_zone
-                Tags = subnet.tags_all
-            }
+        for key, subnet in aws_subnet.this : key => {
+            az   = subnet.availability_zone
+            cidr = subnet.cidr_block
+            id   = subnet.id
+            tags = subnet.tags_all
+        }
     }
 }
 

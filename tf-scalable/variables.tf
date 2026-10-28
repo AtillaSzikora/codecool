@@ -21,7 +21,45 @@ variable "vpc_config" {
     })
 }
 
-variable "subnet_pairs_count" {
-    description = "Number of public-private Subnet pairs to Create"
-    type = number
+variable "instance_type" {
+    description = "Instance Type"
+    type = string
+}
+
+variable "subnet_map" {
+    description = "Subnet Map"
+    type = map(object({
+        az = string
+        cidr = string
+        type = string
+        ec2_insta_count = number
+    }))
+    validation {
+        condition = alltrue([
+            for subnet in values(var.subnet_map) :
+            contains(["eu-central-1a", "eu-central-1b", "eu-central-1c"], subnet.az)
+        ])
+        error_message = "Each availability zone must be one of the following: 'eu-central-1a', 'eu-central-1b', 'eu-central-1c'."
+    }
+    validation {
+        condition = alltrue([
+            for subnet in values(var.subnet_map) :
+            contains(["public", "private"], subnet.type)
+        ])
+        error_message = "Each subnet type must be either 'public' or 'private'."
+    }
+    validation {
+        condition = alltrue([
+            for subnet in values(var.subnet_map) :
+            can(cidrhost(subnet.cidr, 0))
+        ])
+        error_message = "Each subnet cidr must be a valid CIDR block."
+    }
+    validation {
+        condition = alltrue([
+            for subnet in values(var.subnet_map) :
+            subnet.ec2_insta_count >= 0 && subnet.ec2_insta_count <= 3
+        ])
+        error_message = "Each subnet ec2_insta_count must be between 0 and 3."
+    }
 }

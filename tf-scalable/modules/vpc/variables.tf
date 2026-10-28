@@ -1,8 +1,3 @@
-variable "region" {
-    description = "AWS Region"
-    type = string
-}
-
 variable "vpc_config" {
     description = "VPC Configuration"
     type = object({
@@ -11,7 +6,12 @@ variable "vpc_config" {
     })
 }
 
-variable "subnet_pairs_count" {
-    description = "Number of public-private Subnet pairs to Create"
-    type = number
+variable "subnet_map" {
+    description = "Subnet Map"
+    type = map(object({
+        az = string
+        cidr = string
+        type =  string
+        ec2_insta_count = number
+    }))
 }
