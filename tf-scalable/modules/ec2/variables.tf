@@ -3,8 +3,8 @@ variable "instance_type" {
     type = string
 }
 
-variable "subnet_map" {
-    description = "Subnet Map"
+variable "subnet_config" {
+    description = "Subnet Configuration for creating Subnets"
     type = map(object({
         az = string
         cidr = string
@@ -14,11 +14,15 @@ variable "subnet_map" {
 }
 
 variable "subnet_info" {
-    description = "Subnet Configuration"
+    description = "Subnet Information with IDs after creation"
     type = map(object({
         az = string
         cidr = string
         id = string
         tags = map(string)
     }))
+}
+
+variable "vpc_id" {
+    type = string
 }

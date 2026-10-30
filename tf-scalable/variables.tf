@@ -26,8 +26,8 @@ variable "instance_type" {
     type = string
 }
 
-variable "subnet_map" {
-    description = "Subnet Map"
+variable "subnet_config" {
+    description = "Subnet Configuration for creating Subnets"
     type = map(object({
         az = string
         cidr = string
@@ -36,28 +36,28 @@ variable "subnet_map" {
     }))
     validation {
         condition = alltrue([
-            for subnet in values(var.subnet_map) :
+            for subnet in values(var.subnet_config) :
             contains(["eu-central-1a", "eu-central-1b", "eu-central-1c"], subnet.az)
         ])
         error_message = "Each availability zone must be one of the following: 'eu-central-1a', 'eu-central-1b', 'eu-central-1c'."
     }
     validation {
         condition = alltrue([
-            for subnet in values(var.subnet_map) :
+            for subnet in values(var.subnet_config) :
             contains(["public", "private"], subnet.type)
         ])
         error_message = "Each subnet type must be either 'public' or 'private'."
     }
     validation {
         condition = alltrue([
-            for subnet in values(var.subnet_map) :
+            for subnet in values(var.subnet_config) :
             can(cidrhost(subnet.cidr, 0))
         ])
         error_message = "Each subnet cidr must be a valid CIDR block."
     }
     validation {
         condition = alltrue([
-            for subnet in values(var.subnet_map) :
+            for subnet in values(var.subnet_config) :
             subnet.ec2_insta_count >= 0 && subnet.ec2_insta_count <= 3
         ])
         error_message = "Each subnet ec2_insta_count must be between 0 and 3."

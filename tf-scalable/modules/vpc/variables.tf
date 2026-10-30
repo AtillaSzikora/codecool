@@ -6,8 +6,8 @@ variable "vpc_config" {
     })
 }
 
-variable "subnet_map" {
-    description = "Subnet Map"
+variable "subnet_config" {
+    description = "Subnet Configuration for creating Subnets"
     type = map(object({
         az = string
         cidr = string

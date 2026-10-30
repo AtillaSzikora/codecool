@@ -9,7 +9,7 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_subnet" "this" {
-    for_each = var.subnet_map
+    for_each = var.subnet_config
     
     vpc_id = aws_vpc.this.id
     cidr_block = each.value["cidr"]
@@ -24,7 +24,7 @@ resource "aws_eip" "this" {
 
 resource "aws_nat_gateway" "this" {
     allocation_id = aws_eip.this.id
-    subnet_id = aws_subnet.this[keys(var.subnet_map)[0]].id
+    subnet_id = aws_subnet.this[keys(var.subnet_config)[0]].id
     connectivity_type = "public"
     availability_mode = "zonal"
     depends_on = [ aws_internet_gateway.this ]
@@ -32,7 +32,7 @@ resource "aws_nat_gateway" "this" {
 }
 
 resource "aws_route_table" "this" {
-    for_each = var.subnet_map
+    for_each = var.subnet_config
     
     vpc_id = aws_vpc.this.id
     route {
@@ -50,7 +50,7 @@ resource "aws_route_table" "this" {
 }
 
 resource "aws_route_table_association" "this" {
-    for_each = var.subnet_map
+    for_each = var.subnet_config
     
     subnet_id = aws_subnet.this[each.key].id
     route_table_id = aws_route_table.this[each.key].id
