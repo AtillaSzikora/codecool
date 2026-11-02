@@ -12,3 +12,18 @@ output "private_subnet_ids" {
   description = "Private subnet IDs, in availability-zone order"
   value       = [for az in var.availability_zones : aws_subnet.private[az].id]
 }
+
+output "cluster_name" {
+  description = "Name of the EKS cluster"
+  value       = aws_eks_cluster.main.name
+}
+
+output "cluster_endpoint" {
+  description = "Kubernetes API endpoint for the EKS cluster"
+  value       = aws_eks_cluster.main.endpoint
+}
+
+output "update_kubeconfig_command" {
+  description = "AWS CLI command to configure kubectl for this cluster"
+  value       = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.main.name}"
+}
