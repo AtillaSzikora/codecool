@@ -73,7 +73,7 @@ variable "cluster_endpoint_public_access_cidrs" {
 variable "node_instance_types" {
   description = "EC2 instance types for the EKS managed node group"
   type        = list(string)
-  default     = ["t2.micro"]
+  default     = ["t3.medium"]
 
   validation {
     condition     = length(var.node_instance_types) > 0

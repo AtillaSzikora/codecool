@@ -75,7 +75,7 @@ resource "aws_iam_role_policy_attachment" "eks_nodes_ecr" {
 
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "${var.project_name}-workers"
+  node_group_name = "${var.project_name}-workers-${replace(join("-", var.node_instance_types), ".", "-")}"
   node_role_arn   = aws_iam_role.eks_nodes.arn
   subnet_ids      = [for az in var.availability_zones : aws_subnet.private[az].id]
   instance_types  = var.node_instance_types
@@ -89,6 +89,10 @@ resource "aws_eks_node_group" "main" {
 
   update_config {
     max_unavailable = 1
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   depends_on = [
